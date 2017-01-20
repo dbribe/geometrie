@@ -11,7 +11,7 @@
         <div style="padding: 10px 50px; margin: 0 auto;">
             <svg id="svg" width="1000px" height="700px"></svg>
             <div style="display: inline-block; vertical-align: top;">
-                <textarea id="textarea" style="resize: none; height: 350px; width: 100%;"></textarea>
+                <textarea id="textarea" style="resize: none; height: 350px; width: 100%;" placeholder="Type something here..."></textarea>
                 <button id="button" class="btn btn-primary" style="width: 100%; margin-top: 5px; margin-bottom: 5px;">Display result</button>
                 <div id="inf" style="height: 318px; overflow: auto;">
                 </div>
@@ -41,8 +41,8 @@
      let get = (p) => {
          console.warn(p);
          let r = {x: p.x, y: p.y};
-         r.x += minX;
-         r.y += minY;
+         r.x -= minX;
+         r.y -= minY;
          r.x /= (maxX - minX);
          r.y /= (maxY - minY);
          r.y = 1 - r.y;
