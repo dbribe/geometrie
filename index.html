@@ -1,0 +1,155 @@
+<html>
+    <head>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+        <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"> -->
+        <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous"> -->
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <img src="back.jpeg" style="width: 100%; height: 100%; position:fixed; z-index: -1;">
+        <div style="padding: 10px 50px; margin: 0 auto;">
+            <svg id="svg" width="1000px" height="700px"></svg>
+            <div style="display: inline-block; vertical-align: top;">
+                <textarea id="textarea" style="resize: none; height: 350px; width: 100%;"></textarea>
+                <button id="button" class="btn btn-primary" style="width: 100%; margin-top: 5px; margin-bottom: 5px;">Display result</button>
+                <div id="inf" style="height: 318px; overflow: auto;">
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
+<style>
+ #svg, #textarea{
+     /* border: 2px solid grey; */
+ }
+ p {
+     font-size: 22px;
+     padding: 3px 10px;
+     margin: 0;
+     font-weight: 800;
+ }
+</style>
+<script>
+
+ let f = () => {
+     $("#svg").html("");
+     $("#inf").html("");
+
+     let minX = 1<<30, minY = 1<<30, maxX = -(1<<30), maxY = -(1<<30);
+
+     let get = (p) => {
+         console.warn(p);
+         let r = {x: p.x, y: p.y};
+         r.x += minX;
+         r.y += minY;
+         r.x /= (maxX - minX);
+         r.y /= (maxY - minY);
+         r.y = 1 - r.y;
+         r.x *= 0.8;
+         r.y *= 0.8;
+         r.x += 0.1;
+         r.y += 0.1;
+         r.x *= 1000;
+         r.y *= 700;
+         console.warn(r);
+         return r;
+     }
+
+     let det = (a, b, c) => {
+         return a.x * b.y + b.x * c.y + c.x * a.y - a.y * b.x - b.y * c.x - c.y * a.x;
+     }
+     let points = [];
+     $("#textarea").val().split("\n").forEach((line, index) => {
+         points.push({x: parseFloat($.trim(line).split(/\s+/)[0]), y: parseFloat($.trim(line).split(/\s+/)[1])});
+     });
+     for (let i = 0; i < points.length; i += 1) {
+         minX = Math.min(minX, points[i].x);
+         minY = Math.min(minY, points[i].y);
+         maxX = Math.max(maxX, points[i].x);
+         maxY = Math.max(maxY, points[i].y);
+     }
+     let crt = 0;
+     for (let i = 0; i < points.length; i += 1) {
+         if (points[i].x < points[crt].x) {
+             crt = i;
+         } else if (points[i].x === points[crt].x && points[i].y < points[crt].y) {
+             crt = i;
+         }
+     }
+     let crt2 = 0;
+     for (let i = 0; i < points.length; i += 1) {
+         if (points[i].x > points[crt2].x) {
+             crt2 = i;
+         } else if (points[i].x === points[crt2].x && points[i].y < points[crt2].y) {
+             crt2 = i
+         }
+     }
+     let strt = crt;
+     let stp = crt2;
+     let sol = [points[crt], points[(crt + 1) % points.length]];
+     crt = (crt + 2) % points.length;
+     do {
+         while (sol.length >= 2 && det(sol[sol.length - 2], sol[sol.length - 1], points[crt]) >= 0) {
+             sol.pop();
+         }
+         sol.push(points[crt]);
+         crt++;
+         if (crt >= points.length) {
+             crt -= points.length;
+         }
+     } while (crt !== strt);
+     while (sol.length >= 2 && det(sol[sol.length - 2], sol[sol.length - 1], points[crt]) >= 0) {
+         sol.pop();
+     }
+
+     for (let i = 0; i < sol.length; i += 1) {
+         $("#inf").append(`<p>${sol[i].x} ${sol[i].y}</p>`);
+     }
+
+     let go = (v, c, l, t) => {
+         let pathD = "";
+         let texts = [];
+         for (let i = 0; i < v.length; i += 1) {
+             if (!i) {
+                 pathD += "M "
+             } else {
+                 pathD += "L ";
+             }
+             pathD += `${get(v[i]).x} ${get(v[i]).y} `;
+             let point = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+             point.setAttribute("cx", get(v[i]).x);
+             point.setAttribute("cy", get(v[i]).y);
+             point.setAttribute("r", 5);
+             point.setAttribute("fill", l);
+             $("#svg").append(point);
+
+             let txt = document.createElementNS("http://www.w3.org/2000/svg", "text");
+             txt.innerHTML = `(${v[i].x},${v[i].y})`;
+             txt.setAttribute("text-anchor", "left");
+             txt.setAttribute("user-select", "none");
+             txt.setAttribute("font-size", "22px");
+             txt.setAttribute("font-weight", "800");
+             txt.setAttribute("x", get(v[i]).x + 14);
+             txt.setAttribute("y", get(v[i]).y + 17);
+             txt.setAttribute("fill", t);
+             texts.push(txt);
+         }
+         pathD += "z";
+         let path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+         path.setAttribute("d", pathD);
+         path.setAttribute("stroke", c);
+         path.setAttribute("stroke-width", 4);
+         path.setAttribute("fill", "transparent");
+         $("svg").append(path);
+
+         texts.forEach((text) => {
+             $("#svg").append(text);
+         });
+     };
+
+     go(points, "rgba(255,255,255,0.1)", "rgba(255,255,255,0.5)", "rgba(255,255,255,0.5)");
+     go(sol, "rgba(255,255,255,0.7)", "rgba(255,255,255,0.9)","rgba(255,255,255,1)");
+ }
+ $("#button").click(f);
+</script>
