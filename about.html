@@ -1,0 +1,35 @@
+<html>
+    <head>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+        <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"> -->
+        <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous"> -->
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <img src="back.jpeg" style="width: 100%; height: 100%; position:fixed; z-index: -1;">
+        <a href="index.html" class="btn btn-primary" style="position: absolute; top: 5px; left: 5px;">Back to main page</a>
+        <div style="padding: 10px 50px; margin: 0 auto; max-width: 60%;">
+            <h1 class="text-center">Infasuratoare convexa in O(N) pentru un poligon dat</h2>
+            <p>Problema clasica a infasuratorii convexe presupune determinarea celui mai mic poligon convex ce contine toate cele N puncte, puncte date in orice ordine. Algoritmul este destul de simplu:</p>
+            <ul>
+                <li><p>Sortam punctele dupa una din cele 2 coordonate (sa zicem OY)</p></li>
+                <li><p>Pornim de la primul punct din sortare (extremitatea de jos care sigur face parte din infasuratoare)</p></li>
+                <li><p>Parcurgem punctele element cu element in ordinea sortarii, iar cu ajutorul unei stive, mentinem la fiecare moment de timp infasuratoarea convexa. Mai exact, cand incercam sa inseram un punct nou in infasuratoare, verificam semnul acestuia fata de dreapta determinata de ultimile 2 puncte. Daca acesta este negativ, inseamna ca cele 3 puncte formeaza o concavitate, fapt care rezulta la eliminarea ultimului punct. Procedeul se repeta cat timp noul punct cu ultimile 2 puncte din infasuratoare nu mai formeaza o concavitate (convexitatea incearca sa inchida poligonul)</p></li>
+                <li><p>Parcurgand elementele de la punctul cu cel mai mic Y, pana la elementul cu cel mai mare Y, obtinem doar jumatate din infasuratoare (partea stanga). Pentru partea dreapta procedam analog pornind de la ultimul punct inspre primul.</p></li>
+            </ul>
+            <p> Complexitatea acestui algoritm este O(N log N) deoarece avem o sortare.</p>
+            <br>
+            <p>Cerinta noastra insa este o particularitate a problemei de infasuratoare convexa care spune: Dandu-se un poligon concav cu N puncte, sa se determine infasuratoarea sa convexa.</p>
+            <p>Observam faptul ca algoritmul de determinare a infasuratorii cu stiva functioneaza pentru orice parcurgere 'concava' a punctelor (orice ciclu hamiltonian al punctelor astfel incat sa nu avem segmente care se autointersecteaza), fara sa mai fie nevoie sa sortam punctele dupa vreo coordonata. Pornind dintr-o extrema (un punct cu una din coordonate minima/maxima), este suficient sa consideram parcurgerea punctelor in ordinea in care ne este data de poligonul concav. Astfel, la orice moment de timp putem mentine infasuratoarea fara a permite sa formam o concavitate pentru oricare 3 puncte consecutive selectate. Deasemenea, infasuratoarea poate fi determinata dintr-o singura parcurgere.</p>
+            <p>Complexitatea algoritmului in acest caz particular: O(N)</p>
+        </div>
+    </body>
+</html>
+<style>
+ p {
+     font-size: 22px;
+     padding: 3px 10px;
+     margin: 0;
+ }
+</style>
